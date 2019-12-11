@@ -7,7 +7,7 @@ import numpy as np  # Libreria para manejar las matrices
 import re           # Libreria para manjera expresiones regulares
 import ast          # Libreria para usa Abstract Syntax Trees
 from pandas import read_csv, DataFrame # Leer csvs
-from federatedPCA import SAPCA,merge # Algoritmos implementados segun el paper
+from federatedPCA import privateSAPCA,merge # Algoritmos implementados segun el paper
 from sklearn.preprocessing import scale
 
 def str2array(s):
@@ -71,7 +71,7 @@ def Participante(currentU,currentS,currentR,q):
             cadAEnviar=np.array_str(currentU)+"/"+np.array_str(currentS)+"/"+str(currentR)
             # Se envia el mensaje codificado
             s.send(cadAEnviar)
-            s.close()
+            #s.close()
             # Se finaliza la comunicacion y se establece la bandera como verdadera.
             yaFuiParticipante = True
             break
@@ -87,12 +87,12 @@ TCP_IP = '127.0.0.1' # Direccion IP local para comunicacion entre procesos via T
 BUFFER_SIZE = 1024  # Tamanio del buffer de comunicacion
 
 i=raw_input()
-data = read_csv('wine'+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
+data = read_csv('mnist'+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
 data = DataFrame(scale(data), index=data.index, columns=data.columns)
 XMat = data.rename_axis('ID').values # Se convierten los datos en una matriz.
 XMat=XMat.T # Se transpone la matriz para ser consistente con el paper.
-currentR=7 # Estimacion inicial del rango
-currentR,currentU,currentS=SAPCA(currentR,XMat,125,.001,.5) # Se calculan las direcciones principales con los datos disponibles
+currentR=11 # Estimacion inicial del rango
+currentR,currentU,currentS=privateSAPCA(currentR,XMat,125,1.e-6,1,.01,4) # Se calculan las direcciones principales con los datos disponibles
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Se crea un socket para establecer comunicaciones cliente a cliente
 s.bind((TCP_IP, 0))
@@ -118,7 +118,7 @@ while 1:
             data = conn.recv(BUFFER_SIZE)
             if not data: break
             mensajeReconstruido+=data
-        #conn.close() # se cierra la conexion
+        conn.close() # se cierra la conexion
         # Se decodificaran las matrices obtenidas del mensaje
         matrices = mensajeReconstruido.split('/') 
         incomingU=str2array(matrices[0])

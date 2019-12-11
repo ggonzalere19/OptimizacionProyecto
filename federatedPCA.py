@@ -1,25 +1,47 @@
 import numpy as np
 
+def privateSAPCA(r,Y,b,alfa,beta,epsilon,delta):
+    U=np.array([])
+    S=np.array([])
+    while(Y.size>0):
+        if Y.shape[1]>b:
+            Ys=Y[:,:b]
+            Uk,Sk=SMSULQ(r,Ys,b,epsilon,delta)
+            print Uk, Sk
+            Y=np.delete(Y,np.s_[:b],axis=1)
+        else:
+            Uk,Sk = SMSULQ(r,Y,b,epsilon,delta)
+            Y=np.delete(Y, np.s_[:Y.shape[1]], axis=1)
+        if U.size!=0 and S.size!=0:
+            U,S=merge(r,U,S,Uk,Sk)
+        else:
+            U,S=Uk,Sk
+        #print('merged')
+        r,U,S = RankAdjust(r,U,S,alfa,beta)
+    return r,U,S
+
 def SMSULQ(r,B,b,epsilon,delta):
-    print "smsulq"
     U=np.array([])
     S=np.array([])
     omega=CalculateOmega(B.shape[0],B.shape[1],epsilon,delta)
     BOg=B
+    B=B.T
     while(B.size>0):
+        #print 'smsulq'
+        #print B.shape
         if B.shape[1]>b:
-            N = np.random.normal(0, omega*omega, (B.shape[0], b))
+            #N = np.random.normal(0, omega*omega, (BOg.shape[0], b))
+            N = np.zeros((BOg.shape[0],b))
             Bsi=B[:,:b]
-            print(Bsi.shape)
-            print(BOg.shape)
-            Bs=(1/b)*BOg.T.dot(Bsi)+N
+            Bs=(1/b)*BOg.dot(Bsi)+N
             U,S=RSPCA(b,Bs,U,S)
             B=np.delete(B,np.s_[:b],axis=1)
         else:
-            N = np.random.normal(0, omega*omega, (B.shape[0], b))
-            Bs=(1/b)*BOg.T.dot(B)
+            #N = np.random.normal(0, omega*omega, (BOg.shape[0], B.shape[1]))
+            N = np.zeros((BOg.shape[0],B.shape[1]))
+            Bs=(1/b)*BOg.dot(B)+N
             U,S = RSPCA(b,Bs,U,S)
-            B=np.delete(B, np.s_[:B.shape[1]], axis=1)
+            B=np.delete(B, np.s_[:B.shape[0]], axis=1)
     return U,S
 
 def CalculateOmega(d,n,epsilon,delta):
@@ -57,6 +79,10 @@ def CalculateC(S,r):
     sumSigma=0
     for i in range(r):
         sumSigma+=S[i,i]
+    if sumSigma==0:
+        return -1
+    #print(sigmaR)
+    #print(sumSigma)
     return sigmaR/sumSigma
 
 def RSPCA(r,D,U,S):

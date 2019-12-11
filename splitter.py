@@ -1,9 +1,8 @@
 from pandas import read_csv
 
-data = read_csv('wine.csv')
-X = data.drop("quality",1)
+X = read_csv('mnist.csv')
 
-for i in range(250,len(X.index),250):
-    dfAux=X[i-250:i]
-    dfAux.to_csv(index=False,path_or_buf='./wine'+str(i)+".csv")
+for i in range(2000,len(X.index),2000):
+    dfAux=X[i-2000:i]
+    dfAux.to_csv(index=False,path_or_buf='./mnist'+str(i)+".csv")
 
