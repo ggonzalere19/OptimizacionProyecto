@@ -6,8 +6,9 @@ import struct       # Libreria para manejar bytes como datos desempacados
 import numpy as np  # Libreria para manejar las matrices
 import re           # Libreria para manjera expresiones regulares
 import ast          # Libreria para usa Abstract Syntax Trees
+import sys
 from pandas import read_csv, DataFrame # Leer csvs
-from federatedPCA import privateSAPCA,merge # Algoritmos implementados segun el paper
+from federatedPCA import SAPCA,privateSAPCA,merge # Algoritmos implementados segun el paper
 from sklearn.preprocessing import scale
 
 def str2array(s):
@@ -82,17 +83,20 @@ def Participante(currentU,currentS,currentR,q):
     q.append(yaFuiParticipante)
     return
 
+np.set_printoptions(threshold=sys.maxsize)
 soyParticipante = False 
 TCP_IP = '127.0.0.1' # Direccion IP local para comunicacion entre procesos via TCP y UDP
 BUFFER_SIZE = 1024  # Tamanio del buffer de comunicacion
 
+dataSetName='wine'
 i=raw_input()
-data = read_csv('mnist'+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
+data = read_csv('./datasets/'+dataSetName+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
 data = DataFrame(scale(data), index=data.index, columns=data.columns)
 XMat = data.rename_axis('ID').values # Se convierten los datos en una matriz.
 XMat=XMat.T # Se transpone la matriz para ser consistente con el paper.
 currentR=11 # Estimacion inicial del rango
-currentR,currentU,currentS=privateSAPCA(currentR,XMat,125,1.e-6,1,.01,4) # Se calculan las direcciones principales con los datos disponibles
+currentR,currentU,currentS=privateSAPCA(currentR,XMat,4,1.e-6,1,4,.01) # Se calculan las direcciones principales con los datos disponibles
+#currentR,currentU,currentS=SAPCA(currentR,XMat,20,1.e-6,1)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Se crea un socket para establecer comunicaciones cliente a cliente
 s.bind((TCP_IP, 0))
@@ -102,8 +106,10 @@ s.settimeout(2) # Se define el tiempo por el cual el proceso buscara ser lider.
 
 while 1:
     # Se guardan las estimaciones actuales de U y S
-    np.save('currentU', currentU)
-    np.save('currentS', currentS)
+    np.save('currentUPrivate', currentU)
+    np.save('currentSPrivate', currentS)
+    #np.save('currentU', currentU)
+    #np.save('currentS', currentS)
     print("Soy Lider")
     time.sleep(1)
     send("lider "+str(puertoLider)) # Se le manda una invitacion a todos los participantes.

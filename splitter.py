@@ -1,8 +1,13 @@
 from pandas import read_csv
 
-X = read_csv('mnist.csv')
+X = read_csv('./datasets/normalData.csv')
+blockSize=2000
+scanned=0
 
-for i in range(2000,len(X.index),2000):
-    dfAux=X[i-2000:i]
-    dfAux.to_csv(index=False,path_or_buf='./mnist'+str(i)+".csv")
+for i in range(blockSize,len(X.index),blockSize):
+    dfAux=X[i-blockSize:i]
+    dfAux.to_csv(index=False,path_or_buf='./datasets/normalData'+str(i)+".csv")
+    scanned+=blockSize
 
+dfAux=X[scanned:]
+dfAux.to_csv(index=False,path_or_buf='./datasets/normalData'+str(X.shape[0])+".csv")

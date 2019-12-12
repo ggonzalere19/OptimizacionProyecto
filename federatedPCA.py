@@ -7,7 +7,6 @@ def privateSAPCA(r,Y,b,alfa,beta,epsilon,delta):
         if Y.shape[1]>b:
             Ys=Y[:,:b]
             Uk,Sk=SMSULQ(r,Ys,b,epsilon,delta)
-            print Uk, Sk
             Y=np.delete(Y,np.s_[:b],axis=1)
         else:
             Uk,Sk = SMSULQ(r,Y,b,epsilon,delta)
@@ -16,7 +15,6 @@ def privateSAPCA(r,Y,b,alfa,beta,epsilon,delta):
             U,S=merge(r,U,S,Uk,Sk)
         else:
             U,S=Uk,Sk
-        #print('merged')
         r,U,S = RankAdjust(r,U,S,alfa,beta)
     return r,U,S
 
@@ -25,23 +23,20 @@ def SMSULQ(r,B,b,epsilon,delta):
     S=np.array([])
     omega=CalculateOmega(B.shape[0],B.shape[1],epsilon,delta)
     BOg=B
-    B=B.T
     while(B.size>0):
-        #print 'smsulq'
-        #print B.shape
-        if B.shape[1]>b:
+        if B.shape[0]>b:
             #N = np.random.normal(0, omega*omega, (BOg.shape[0], b))
             N = np.zeros((BOg.shape[0],b))
-            Bsi=B[:,:b]
-            Bs=(1/b)*BOg.dot(Bsi)+N
-            U,S=RSPCA(b,Bs,U,S)
-            B=np.delete(B,np.s_[:b],axis=1)
+            Bsi=B[:b,:]
+            Bs=(1.0/b)*BOg.dot(Bsi.T)+N
+            U,S=RSPCA(r,Bs,U,S)
+            B=np.delete(B,np.s_[:b],axis=0)
         else:
-            #N = np.random.normal(0, omega*omega, (BOg.shape[0], B.shape[1]))
-            N = np.zeros((BOg.shape[0],B.shape[1]))
-            Bs=(1/b)*BOg.dot(B)+N
-            U,S = RSPCA(b,Bs,U,S)
-            B=np.delete(B, np.s_[:B.shape[0]], axis=1)
+            #N = np.random.normal(0, omega*omega, (BOg.shape[0], B.shape[0]))
+            N = np.zeros((BOg.shape[0], B.shape[0]))
+            Bs=(1.0/b)*BOg.dot(B.T)+N
+            U,S = RSPCA(r,Bs,U,S)
+            B=np.delete(B, np.s_[:B.shape[0]], axis=0)
     return U,S
 
 def CalculateOmega(d,n,epsilon,delta):
@@ -63,7 +58,7 @@ def SAPCA(r,Y,b,alfa,beta):
 
 def RankAdjust(r,U,S,alfa,beta):
     c=CalculateC(S,r)
-    if c>beta and U.shape[1]<r:
+    if c>beta:
         oneVector=np.zeros((U.shape[0],1))
         oneVector[r]=1
         newS=np.zeros((S.shape[0]+1, S.shape[1]+1))
@@ -81,8 +76,6 @@ def CalculateC(S,r):
         sumSigma+=S[i,i]
     if sumSigma==0:
         return -1
-    #print(sigmaR)
-    #print(sumSigma)
     return sigmaR/sumSigma
 
 def RSPCA(r,D,U,S):
