@@ -45,7 +45,7 @@ plt.ylabel('y')
 plt.title('SAPCA')
 plt.show()
 
-x=-privateComp[0,:]
+x=privateComp[0,:]
 y=privateComp[1,:]
 plt.scatter(x, y)
 plt.xlabel('x')

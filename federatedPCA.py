@@ -25,15 +25,15 @@ def SMSULQ(r,B,b,epsilon,delta):
     BOg=B
     while(B.size>0):
         if B.shape[0]>b:
-            #N = np.random.normal(0, omega*omega, (BOg.shape[0], b))
-            N = np.zeros((BOg.shape[0],b))
+            N = np.random.normal(0, omega*omega, (BOg.shape[0], b))
+            #N = np.zeros((BOg.shape[0],b))
             Bsi=B[:b,:]
             Bs=(1.0/b)*BOg.dot(Bsi.T)+N
             U,S=RSPCA(r,Bs,U,S)
             B=np.delete(B,np.s_[:b],axis=0)
         else:
-            #N = np.random.normal(0, omega*omega, (BOg.shape[0], B.shape[0]))
-            N = np.zeros((BOg.shape[0], B.shape[0]))
+            N = np.random.normal(0, omega*omega, (BOg.shape[0], B.shape[0]))
+            #N = np.zeros((BOg.shape[0], B.shape[0]))
             Bs=(1.0/b)*BOg.dot(B.T)+N
             U,S = RSPCA(r,Bs,U,S)
             B=np.delete(B, np.s_[:B.shape[0]], axis=0)

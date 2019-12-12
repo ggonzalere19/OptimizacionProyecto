@@ -88,7 +88,7 @@ soyParticipante = False
 TCP_IP = '127.0.0.1' # Direccion IP local para comunicacion entre procesos via TCP y UDP
 BUFFER_SIZE = 1024  # Tamanio del buffer de comunicacion
 
-dataSetName='wine'
+dataSetName='normalData'
 i=raw_input()
 data = read_csv('./datasets/'+dataSetName+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
 data = DataFrame(scale(data), index=data.index, columns=data.columns)
@@ -96,7 +96,7 @@ XMat = data.rename_axis('ID').values # Se convierten los datos en una matriz.
 XMat=XMat.T # Se transpone la matriz para ser consistente con el paper.
 currentR=11 # Estimacion inicial del rango
 currentR,currentU,currentS=privateSAPCA(currentR,XMat,4,1.e-6,1,4,.01) # Se calculan las direcciones principales con los datos disponibles
-#currentR,currentU,currentS=SAPCA(currentR,XMat,20,1.e-6,1)
+#currentR,currentU,currentS=SAPCA(currentR,XMat,100,1.e-6,1)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Se crea un socket para establecer comunicaciones cliente a cliente
 s.bind((TCP_IP, 0))
