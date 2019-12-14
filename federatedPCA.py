@@ -21,7 +21,9 @@ def privateSAPCA(r,Y,b,alfa,beta,epsilon,delta):
 def SMSULQ(r,B,b,epsilon,delta):
     U=np.array([])
     S=np.array([])
-    omega=CalculateOmega(B.shape[0],B.shape[1],epsilon,delta)
+    d=B.shape[0]
+    n=B.shape[1]
+    omega=CalculateOmega(b,n,epsilon,delta)
     BOg=B
     while(B.size>0):
         if B.shape[0]>b:
@@ -32,6 +34,7 @@ def SMSULQ(r,B,b,epsilon,delta):
             U,S=RSPCA(r,Bs,U,S)
             B=np.delete(B,np.s_[:b],axis=0)
         else:
+            omega=CalculateOmega(B.shape[0],n,epsilon,delta)
             N = np.random.normal(0, omega*omega, (BOg.shape[0], B.shape[0]))
             #N = np.zeros((BOg.shape[0], B.shape[0]))
             Bs=(1.0/b)*BOg.dot(B.T)+N
@@ -58,7 +61,7 @@ def SAPCA(r,Y,b,alfa,beta):
 
 def RankAdjust(r,U,S,alfa,beta):
     c=CalculateC(S,r)
-    if c>beta:
+    if c>beta and U.shape[0]>r:
         oneVector=np.zeros((U.shape[0],1))
         oneVector[r]=1
         newS=np.zeros((S.shape[0]+1, S.shape[1]+1))

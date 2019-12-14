@@ -87,16 +87,25 @@ np.set_printoptions(threshold=sys.maxsize)
 soyParticipante = False 
 TCP_IP = '127.0.0.1' # Direccion IP local para comunicacion entre procesos via TCP y UDP
 BUFFER_SIZE = 1024  # Tamanio del buffer de comunicacion
+private=True # Bandera que especifica si usar SAPCA o private SAPCA
+b=100
+epsilon=4
+delta=.4
+alfa=.2
+beta=.3
+currentR=10 # Estimacion inicial del rango
 
-dataSetName='normalData'
+dataSetName='mnist'
 i=raw_input()
 data = read_csv('./datasets/'+dataSetName+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
 data = DataFrame(scale(data), index=data.index, columns=data.columns)
 XMat = data.rename_axis('ID').values # Se convierten los datos en una matriz.
 XMat=XMat.T # Se transpone la matriz para ser consistente con el paper.
-currentR=11 # Estimacion inicial del rango
-currentR,currentU,currentS=privateSAPCA(currentR,XMat,4,1.e-6,1,4,.01) # Se calculan las direcciones principales con los datos disponibles
-#currentR,currentU,currentS=SAPCA(currentR,XMat,100,1.e-6,1)
+
+if private:
+    currentR,currentU,currentS=privateSAPCA(currentR,XMat,b,alfa,beta,epsilon,delta) # Se calculan las direcciones principales con los datos disponibles
+else:
+    currentR,currentU,currentS=SAPCA(currentR,XMat,b,alfa,beta)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Se crea un socket para establecer comunicaciones cliente a cliente
 s.bind((TCP_IP, 0))
@@ -106,10 +115,13 @@ s.settimeout(2) # Se define el tiempo por el cual el proceso buscara ser lider.
 
 while 1:
     # Se guardan las estimaciones actuales de U y S
-    np.save('currentUPrivate', currentU)
-    np.save('currentSPrivate', currentS)
-    #np.save('currentU', currentU)
-    #np.save('currentS', currentS)
+    if private:
+        np.save('currentUPrivate'+dataSetName, currentU)
+        np.save('currentSPrivate'+dataSetName, currentS)
+    else:
+        np.save('currentU'+dataSetName, currentU)
+        np.save('currentS'+dataSetName, currentS)
+
     print("Soy Lider")
     time.sleep(1)
     send("lider "+str(puertoLider)) # Se le manda una invitacion a todos los participantes.
