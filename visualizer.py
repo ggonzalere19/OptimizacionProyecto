@@ -7,7 +7,7 @@ from federatedPCA import merge,privateSAPCA,SMSULQ,SAPCA
 import scipy
 
 #XMat=np.load('normalData.npy')
-dataSetName='mnist'
+dataSetName='normalData'
 data = read_csv('./datasets/'+dataSetName+'.csv')
 #data=data.drop('quality',axis=1)
 newdf = DataFrame(scale(data), index=data.index, columns=data.columns)
@@ -40,7 +40,7 @@ plt.title('PCA completo ' + dataSetName)
 plt.show()
 
 x=SapcaComp[0,:]
-y=SapcaComp[1,:]
+y=-SapcaComp[1,:]
 plt.scatter(x, y)
 plt.xlabel('x')
 plt.ylabel('y')
@@ -48,7 +48,7 @@ plt.title('SAPCA '+ dataSetName+' rango: '+ str(rSAPCA))
 plt.show()
 
 x=privateComp[0,:]
-y=-privateComp[1,:]
+y=privateComp[1,:]
 plt.scatter(x, y)
 plt.xlabel('x')
 plt.ylabel('y')

@@ -87,15 +87,15 @@ np.set_printoptions(threshold=sys.maxsize)
 soyParticipante = False 
 TCP_IP = '127.0.0.1' # Direccion IP local para comunicacion entre procesos via TCP y UDP
 BUFFER_SIZE = 1024  # Tamanio del buffer de comunicacion
-private=True # Bandera que especifica si usar SAPCA o private SAPCA
+private=False # Bandera que especifica si usar SAPCA o private SAPCA
 b=100
 epsilon=4
 delta=.4
-alfa=.2
-beta=.3
-currentR=10 # Estimacion inicial del rango
+alfa=.1
+beta=.2
+currentR=5 # Estimacion inicial del rango
 
-dataSetName='mnist'
+dataSetName='normalData'
 i=raw_input()
 data = read_csv('./datasets/'+dataSetName+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
 data = DataFrame(scale(data), index=data.index, columns=data.columns)
