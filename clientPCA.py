@@ -87,15 +87,15 @@ np.set_printoptions(threshold=sys.maxsize)
 soyParticipante = False 
 TCP_IP = '127.0.0.1' # Direccion IP local para comunicacion entre procesos via TCP y UDP
 BUFFER_SIZE = 1024  # Tamanio del buffer de comunicacion
-private=False # Bandera que especifica si usar SAPCA o private SAPCA
-b=100
+private=True # Bandera que especifica si usar SAPCA o private SAPCA
+b=11
 epsilon=4
 delta=.4
 alfa=.1
 beta=.2
 currentR=5 # Estimacion inicial del rango
 
-dataSetName='normalData'
+dataSetName='wine'
 i=raw_input()
 data = read_csv('./datasets/'+dataSetName+i+'.csv') # Lectura de los datos parcial de un conjunto de datos
 data = DataFrame(scale(data), index=data.index, columns=data.columns)
@@ -136,6 +136,7 @@ while 1:
             data = conn.recv(BUFFER_SIZE)
             if not data: break
             mensajeReconstruido+=data
+        time.sleep(.5)# dormir antes de cerrar la conexion para evitar los broken pipes
         conn.close() # se cierra la conexion
         # Se decodificaran las matrices obtenidas del mensaje
         matrices = mensajeReconstruido.split('/') 
