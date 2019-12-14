@@ -33,8 +33,8 @@ USapca=checkSigns(UOg,USapca)
 UPrivate=checkSigns(UOg,UPrivate)
 
 # Se calculan las distancias de Frobenius con respecto de PCA exacto.
-distSapca=np.linalg.norm(UOg[:,:rSAPCA]-USapca)
-distPrivate=np.linalg.norm(UOg[:,:rPrivate]-UPrivate)
+distSapca=np.linalg.norm(UOg[:,:rSAPCA]-USapca,'fro')
+distPrivate=np.linalg.norm(UOg[:,:rPrivate]-UPrivate,'fro')
 
 # Se evaluan las componentes principales usando las matrices descritas anteriormente
 privateComp=UPrivate.T.dot(XMat)
