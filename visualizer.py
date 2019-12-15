@@ -13,7 +13,7 @@ def checkSigns(UOriginal, UAprox):
     return UAprox
 
 # Se selecciona que ejemplo visualizar
-dataSetName='normalData'
+dataSetName='mnist'
 data = read_csv('./datasets/'+dataSetName+'.csv')
 newdf = DataFrame(scale(data), index=data.index, columns=data.columns)
 XMat = newdf.rename_axis('ID').values
@@ -44,7 +44,10 @@ SapcaComp=USapca.T.dot(XMat)
 # Se grafican las primeras dos componentes para PCA exacto, SAPCA y private-SAPCA
 x=ogComp[0,:]
 y=ogComp[1,:]
-plt.scatter(x, y)
+if dataSetName=='mnist':
+    plt.scatter(x, y,c=XMat[0,:])
+else:
+    plt.scatter(x, y)
 plt.xlabel('x')
 plt.ylabel('y')
 plt.title('PCA completo ' + dataSetName)
@@ -52,7 +55,10 @@ plt.show()
 
 x=SapcaComp[0,:]
 y=SapcaComp[1,:]
-plt.scatter(x, y)
+if dataSetName=='mnist':
+    plt.scatter(x, y,c=XMat[0,:])
+else:
+    plt.scatter(x, y)
 plt.xlabel('x')
 plt.ylabel('y')
 plt.title('SAPCA '+ dataSetName+' rango: '+ str(rSAPCA)+ ' dist a U: '+ str(distSapca))
@@ -60,7 +66,10 @@ plt.show()
 
 x=privateComp[0,:]
 y=privateComp[1,:]
-plt.scatter(x, y)
+if dataSetName=='mnist':
+    plt.scatter(x, y,c=XMat[0,:])
+else:
+    plt.scatter(x, y)
 plt.xlabel('x')
 plt.ylabel('y')
 plt.title('Private SAPCA '+ dataSetName+' rango: '+ str(rPrivate)+ ' dist a U: '+ str(distPrivate))
